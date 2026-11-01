@@ -1,6 +1,6 @@
 # Terms and Conditions
 
-**Samsung TV Remote** · Effective 21 October 2026
+**Samsung TV Remote** · Effective 1 November 2026
 
 These terms apply to your use of Samsung TV Remote ("the app"), its source code and its
 documentation. By downloading, installing or using the app, you agree to them. If you don't
@@ -11,9 +11,10 @@ agree, don't use the app.
 You may download the app, install it on computers you control, and use it to control
 televisions that you own or are allowed to control. You may change the code for your own use.
 
-No open-source license has been granted yet. Copying, publishing or redistributing the app or
-modified versions of it needs the author's written permission, except where the law allows it
-without permission (for example, forking on GitHub as GitHub's own terms permit).
+The source code is released under the [MIT License](LICENSE): you may use, copy, change,
+publish, distribute and sell it, modified or not, as long as the copyright notice and the license
+text come with every copy. Where these terms and the license disagree about the code, the license
+applies.
 
 ## 2. Your responsibilities
 
@@ -58,11 +59,11 @@ Nothing in these terms limits rights you have under consumer law that can't be w
 
 How the app handles information is described in the [Privacy Policy](PRIVACY.md).
 
-## 8. Changes and termination
+## 8. Changes
 
 These terms may be updated in the repository, with a new effective date. Continuing to use
-the app after a change means you accept the new terms. Your permission to use the app ends
-automatically if you break these terms.
+the app after a change means you accept the new terms. Changes never take back the rights the MIT
+License gives for code you already received.
 
 ## 9. Contact
 

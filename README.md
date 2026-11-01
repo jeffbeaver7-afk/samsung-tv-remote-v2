@@ -1,6 +1,8 @@
 # Samsung TV Remote
 
 [![Tests](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/tests.yml/badge.svg)](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/codeql.yml/badge.svg)](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A desktop remote control for Samsung Tizen smart TVs (2016 and later), for Linux. It sends remote keys,
 opens apps, turns the TV on and off, casts photos, videos and music from this PC, and mirrors the screen,
@@ -376,6 +378,11 @@ audio, and they use a temporary config.
   window is resized (see [Mirroring one window](#mirroring-one-window)). Whole-screen mirroring works with
   either.
 - **One TV:** settings hold a single TV.
+
+## License
+
+[MIT](LICENSE), copyright 2026 baverrr. The Lucide icons keep their ISC License
+(`icons/LICENSE-lucide`).
 
 ## Privacy and terms
 
