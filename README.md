@@ -1,6 +1,7 @@
 # Samsung TV Remote
 
 [![Tests](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/tests.yml/badge.svg)](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/codeql.yml/badge.svg)](https://github.com/baverrr/samsung-tv-remote-v2/actions/workflows/codeql.yml)
 
 A desktop remote control for Samsung Tizen smart TVs (2016 and later), for Linux. It sends remote keys,
 opens apps, turns the TV on and off, casts photos, videos and music from this PC, and mirrors the screen,
