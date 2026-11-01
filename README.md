@@ -49,6 +49,8 @@ Ubuntu 26.04 with KDE Plasma on Wayland.
 - **Desktop integration:** a single window (launching again brings it forward), `tvremote://` links to open
   the remote or the cast window, and a "Cast Files to TV…" action in the app menu.
 - **Command line:** every main action, scriptable.
+- **ESP32 bridge:** `tv-remote serve` takes remote keys, app launches and power over plain HTTP, so an
+  ESPHome device (e.g. a touch screen on the wall) can be a remote too. See [ESP32 bridge](#esp32-bridge).
 
 ## How it works
 
@@ -59,6 +61,7 @@ Ubuntu 26.04 with KDE Plasma on Wayland.
 | Power state | `http://TV:8001/api/v2/` reports `PowerState` (on / standby); no answer means off or unreachable. |
 | Power on | Wake-on-LAN magic packet to the LAN broadcast address. |
 | Casting | The TV's DLNA renderer (UPnP AVTransport on port 9197). A small HTTP server on this PC (port **8199**) serves the file that's playing, only to the TV's address, under an unguessable link that stops working as soon as the queue moves on. |
+| ESP32 bridge | `tv-remote serve`: a small HTTP server on port **8198**. Each request needs a bearer token and goes through the same TV client as the window, so the pairing token, Wi-Fi fallback, app list and confirmed power-off are shared. |
 | Mirroring | GNOME Network Displays (Miracast over Wi-Fi Direct): the patched build in `~/.local/opt/gnd` if there is one, otherwise the system copy. `mirror_audio.py` watches PipeWire (`pactl subscribe`) and routes app audio while a session is streaming. |
 
 ## Requirements
@@ -80,7 +83,7 @@ Ubuntu 26.04 with KDE Plasma on Wayland.
 ```sh
 git clone https://github.com/baverrr/samsung-tv-remote-v2.git ~/.local/share/tv-remote
 cd ~/.local/share/tv-remote
-./install.sh            # add --audio for sound on the TV while mirroring
+./install.sh            # add --audio for sound on the TV while mirroring, --bridge for the ESP32 bridge
 ```
 
 `install.sh` installs for the current user only and needs no root. It:
@@ -90,7 +93,8 @@ cd ~/.local/share/tv-remote
 - installs the `tv-remote` launcher to `~/.local/bin`;
 - adds the **TV Remote** menu entry, its "Cast Files to TV…" action and the `tvremote://` link handler;
 - installs the app icon (`tvremote`);
-- with `--audio`, installs and starts the `tv-mirror-audio` user service.
+- with `--audio`, installs and starts the `tv-mirror-audio` user service;
+- with `--bridge`, installs and starts the `tv-remote-bridge` user service (see [ESP32 bridge](#esp32-bridge)).
 
 The launcher and service point at the folder you ran the script from. If you move the checkout, run it
 again. The templates it fills in are in `packaging/`.
@@ -217,6 +221,7 @@ tv-remote on | off                  # power
 tv-remote info                      # the TV's device details (JSON)
 tv-remote cast ~/Pictures/Trip      # cast files or folders; Ctrl+C stops
 tv-remote mirror                    # start screen mirroring
+tv-remote serve                     # run the ESP32 bridge (port 8198); --token prints its token
 ```
 
 Errors come back as one line saying what failed, e.g. "Couldn't reach the TV at …" or "Netflix isn't
@@ -261,6 +266,71 @@ installed on the TV any more".
   It applies after a reboot. To undo, delete that file and reboot. The [patched build](#mirroring-one-window)
   also gets the picture back within a second after a stall, instead of up to 10.
 
+## ESP32 bridge
+
+<p align="center">
+  <img src="docs/esp32-remote.svg" alt="The TV remote screen on a 320×240 ESP32 touch display: a 3×3 block with Back, Up, Home, Left, OK, Right, Source, Down and Info; Power, Mute, Vol + / − and Ch + / − on the right; and Play, Pause, Netflix and YouTube along the bottom" width="480">
+</p>
+
+Microcontrollers like the ESP32 can't easily keep the TV's TLS WebSocket open. `tv-remote serve` gives
+them plain HTTP on the LAN instead and does the TV side itself:
+
+| Request | Does |
+|---|---|
+| `POST /key/<key>` | Sends a remote key: `volup` or `KEY_VOLUP` |
+| `POST /launch/<app>` | Opens an installed app by key (`netflix`) or by the TV's name for it (URL-encoded) |
+| `POST /power/on` | Wake-on-LAN. Answers at once (`202`) |
+| `POST /power/off` | Presses power until the TV reports standby, in the background (`202`); pressing again meanwhile does nothing |
+| `GET /status` | `{"power": "on"}`, `"standby"` or `"off"` |
+
+Replies are JSON: `{"ok": true, ...}`, or `{"error": "..."}` with `400` (bad key name), `401` (token),
+`403` (address not allowed), `404` (unknown request or app) or `502` (the TV didn't answer or refused).
+
+**Set it up:**
+
+1. Run `./install.sh --bridge`. This starts the `tv-remote-bridge` user service
+   (`journalctl --user -u tv-remote-bridge` for its log).
+2. Get the token with `tv-remote serve --token`. It's generated into `config.json` (`bridge_token`) the
+   first time. Every request needs the header `Authorization: Bearer <token>`.
+3. Optionally, limit which devices can connect. In `config.json`, `"bridge_clients": ["192.0.2.30"]`
+   allows only those addresses, and `"bridge_listen"` picks the address to listen on (default: all).
+4. With a default-deny firewall, let the device reach the port:
+
+   ```sh
+   sudo ufw allow from <ESP32 address> to any port 8198 proto tcp
+   ```
+
+The token travels unencrypted, like everything on plain HTTP. That's fine on a home LAN, but don't
+forward the port to the internet.
+
+**An ESPHome example:**
+
+```yaml
+http_request:
+  timeout: 3s
+
+script:
+  - id: tv_send
+    mode: queued
+    parameters:
+      path: string
+    then:
+      - http_request.post:
+          url: !lambda return std::string("http://192.0.2.10:8198") + path;
+          request_headers:
+            Authorization: "Bearer change-me"
+
+button:
+  - platform: template
+    name: TV Volume Up
+    on_press:
+      - script.execute: {id: tv_send, path: /key/volup}
+```
+
+The touch remote in the picture above is a "Cheap Yellow Display" (ESP32-2432S028R) build. It also
+sends the IR power code (`remote_transmitter.transmit_samsung: {data: 0xE0E040BF}`) through an IR LED,
+which turns on TVs that ignore Wake-on-LAN.
+
 ## Project layout
 
 | File | What it is |
@@ -268,12 +338,13 @@ installed on the TV any more".
 | `tv_remote.py` | TV client (WebSocket keys, REST apps and power, Wake-on-LAN), config, CLI, entry point |
 | `remote_qt.py` | The Qt (PySide6) remote and cast windows, design tokens and stylesheet |
 | `cast.py` | DLNA casting: the file server, the renderer client and the play queue |
+| `bridge.py` | The ESP32 bridge: `tv-remote serve`'s HTTP server |
 | `mirror_audio.py` | PipeWire audio routing while mirroring (standard library only, runs as a user service) |
-| `test_gui.py`, `test_mirror_audio.py` | Tests (the TV and PipeWire are faked; nothing touches the network) |
-| `install.sh`, `packaging/` | Per-user install: launcher, menu entry, icon, audio service templates |
+| `test_gui.py`, `test_bridge.py`, `test_mirror_audio.py` | Tests (the TV and PipeWire are faked; nothing touches the network) |
+| `install.sh`, `packaging/` | Per-user install: launcher, menu entry, icon, audio and bridge service templates |
 | `tools/screenshots.py` | Re-renders the screenshots in `docs/` offscreen |
 | `tools/build-gnd.sh`, `tools/gnd-window-resize.patch` | Builds GNOME Network Displays patched for one-window mirroring |
-| `docs/` | README screenshots (`*.png`) and the mirroring diagram (`mirroring.svg`) |
+| `docs/` | README screenshots (`*.png`), the mirroring diagram (`mirroring.svg`) and the ESP32 remote screen (`esp32-remote.svg`) |
 | `icons/` | Lucide icons used by the windows |
 | `tv-remote.svg` | App icon |
 
@@ -292,7 +363,8 @@ audio, and they use a temporary config.
 ## Known limitations
 
 - **Wake-on-LAN is unreliable on some models.** On the AU8000 it's tested on, the TV drops off the network in
-  standby and ignores magic packets, so turning it on usually needs the physical remote.
+  standby and ignores magic packets, so turning it on usually needs the physical remote, or an IR LED on
+  an [ESP32 remote](#esp32-bridge).
 - **App IDs come from community lists.** Samsung doesn't publish them, and some apps have a different ID on
   2020 and later TVs. `CATALOG` in `tv_remote.py` lists every ID known for each app, and the TV is asked which
   one it has, so a wrong ID only means the app shows as "Not on this TV". Apps outside the catalog can be

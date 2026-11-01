@@ -1,8 +1,9 @@
 #!/bin/sh
 # Installs TV Remote for the current user: a venv, the tv-remote launcher, the menu entry and
-# tvremote:// links, the icon, and (with --audio) the service that sends sound to the TV while mirroring.
+# tvremote:// links, the icon, (with --audio) the service that sends sound to the TV while mirroring,
+# and (with --bridge) the HTTP bridge that ESP32 and other network remotes send their keys to.
 # Run it from the checkout, wherever it lives; run it again after moving the checkout.
-#   ./install.sh [--audio]
+#   ./install.sh [--audio] [--bridge]
 set -eu
 
 APP_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -10,10 +11,12 @@ BIN_DIR="$HOME/.local/bin"
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
 UNITS="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 AUDIO=no
+BRIDGE=no
 for arg in "$@"; do
     case "$arg" in
         --audio) AUDIO=yes ;;
-        *) echo "usage: $0 [--audio]" >&2; exit 2 ;;
+        --bridge) BRIDGE=yes ;;
+        *) echo "usage: $0 [--audio] [--bridge]" >&2; exit 2 ;;
     esac
 done
 
@@ -61,6 +64,14 @@ if [ "$AUDIO" = yes ]; then
     systemctl --user daemon-reload
     systemctl --user enable --now tv-mirror-audio.service
     systemctl --user restart tv-mirror-audio.service  # picks up a moved checkout
+fi
+
+if [ "$BRIDGE" = yes ]; then
+    echo "bridge service: $UNITS/tv-remote-bridge.service (port 8198; token: tv-remote serve --token)"
+    fill "$APP_DIR/packaging/tv-remote-bridge.service.in" "$UNITS/tv-remote-bridge.service"
+    systemctl --user daemon-reload
+    systemctl --user enable --now tv-remote-bridge.service
+    systemctl --user restart tv-remote-bridge.service  # picks up a moved checkout or new code
 fi
 
 case ":$PATH:" in

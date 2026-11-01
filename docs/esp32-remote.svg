@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480" font-family="Roboto, Helvetica, Arial, sans-serif">
+<title>The TV remote screen on the Cheap Yellow Display</title>
+<rect width="640" height="480" fill="#0B1018"/>
+<text x="20" y="36" fill="#8A94A6" font-size="30">TV on</text>
+<text x="620" y="36" fill="#8A94A6" font-size="30" text-anchor="end">Hold: dashboard</text>
+<rect x="20" y="60" width="104" height="100" fill="#1A2230"/>
+<text x="72" y="120" fill="#F2F4F7" font-size="30" text-anchor="middle">Back</text>
+<rect x="132" y="60" width="104" height="100" fill="#1A2230"/>
+<polygon points="184,92 162,124 206,124" fill="#F2F4F7"/>
+<rect x="244" y="60" width="104" height="100" fill="#1A2230"/>
+<text x="296" y="120" fill="#F2F4F7" font-size="30" text-anchor="middle">Home</text>
+<rect x="20" y="168" width="104" height="104" fill="#1A2230"/>
+<polygon points="54,220 86,198 86,242" fill="#F2F4F7"/>
+<rect x="132" y="168" width="104" height="104" fill="#4FB3FF"/>
+<text x="184" y="230" fill="#0B1018" font-size="30" text-anchor="middle">OK</text>
+<rect x="244" y="168" width="104" height="104" fill="#1A2230"/>
+<polygon points="314,220 282,198 282,242" fill="#F2F4F7"/>
+<rect x="20" y="280" width="104" height="100" fill="#1A2230"/>
+<text x="72" y="340" fill="#F2F4F7" font-size="30" text-anchor="middle">Source</text>
+<rect x="132" y="280" width="104" height="100" fill="#1A2230"/>
+<polygon points="184,348 162,316 206,316" fill="#F2F4F7"/>
+<rect x="244" y="280" width="104" height="100" fill="#1A2230"/>
+<text x="296" y="340" fill="#F2F4F7" font-size="30" text-anchor="middle">Info</text>
+<rect x="392" y="60" width="108" height="100" fill="#1A2230"/>
+<text x="446" y="120" fill="#3DD68C" font-size="30" text-anchor="middle">Power</text>
+<rect x="512" y="60" width="108" height="100" fill="#1A2230"/>
+<text x="566" y="120" fill="#F2F4F7" font-size="30" text-anchor="middle">Mute</text>
+<rect x="392" y="168" width="108" height="104" fill="#1A2230"/>
+<text x="446" y="230" fill="#F2F4F7" font-size="30" text-anchor="middle">Vol +</text>
+<rect x="512" y="168" width="108" height="104" fill="#1A2230"/>
+<text x="566" y="230" fill="#F2F4F7" font-size="30" text-anchor="middle">Ch +</text>
+<rect x="392" y="280" width="108" height="100" fill="#1A2230"/>
+<text x="446" y="340" fill="#F2F4F7" font-size="30" text-anchor="middle">Vol -</text>
+<rect x="512" y="280" width="108" height="100" fill="#1A2230"/>
+<text x="566" y="340" fill="#F2F4F7" font-size="30" text-anchor="middle">Ch -</text>
+<rect x="20" y="392" width="144" height="80" fill="#1A2230"/>
+<text x="92" y="442" fill="#F2F4F7" font-size="30" text-anchor="middle">Play</text>
+<rect x="172" y="392" width="144" height="80" fill="#1A2230"/>
+<text x="244" y="442" fill="#F2F4F7" font-size="30" text-anchor="middle">Pause</text>
+<rect x="324" y="392" width="144" height="80" fill="#1A2230"/>
+<text x="396" y="442" fill="#F2F4F7" font-size="30" text-anchor="middle">Netflix</text>
+<rect x="476" y="392" width="144" height="80" fill="#1A2230"/>
+<text x="548" y="442" fill="#F2F4F7" font-size="30" text-anchor="middle">YouTube</text>
+</svg>

@@ -4,6 +4,7 @@ power state over its REST API, power-on by Wake-on-LAN, casting over DLNA (cast.
 GUI:  tv-remote [tvremote://open | tvremote://cast]   (Qt, in remote_qt.py; cast also opens TV Cast)
 CLI:  tv-remote key KEY_VOLUP [KEY_MUTE ...] | apps | launch <name> | text <string> | on | off | info
       tv-remote cast <files or folders...> | mirror
+      tv-remote serve [--token] [port]   (HTTP bridge for e.g. an ESP32 remote, in bridge.py)
       (key also takes short names: volup -> KEY_VOLUP)
 """
 
@@ -582,6 +583,9 @@ def run_command(tv, cfg, cmd, rest):
         print(json.dumps(tv.info()["device"], indent=2))
     elif cmd == "mirror":
         start_mirroring()
+    elif cmd == "serve":
+        import bridge
+        bridge.serve(tv, rest)
     elif cmd == "cast":
         import cast
         done = threading.Event()

@@ -1,10 +1,10 @@
 # Privacy Policy
 
-**Samsung TV Remote** · Effective 21 October 2026
+**Samsung TV Remote** · Effective 31 October 2026
 
 Samsung TV Remote ("the app") is a desktop program that runs entirely on your own computer
-and talks only to the Samsung TV on your local network. It has no accounts, no servers, no
-analytics and no advertising. The author never receives any information about you or your use
+and talks only to the Samsung TV, and to remotes you set up yourself, on your local network.
+It has no accounts, no online servers, no analytics and no advertising. The author never receives any information about you or your use
 of the app.
 
 ## What the app collects
@@ -19,7 +19,7 @@ They're readable only by your user account:
 
 | File | What's in it |
 |---|---|
-| `~/.config/tv-remote/config.json` | Your TV's network address and MAC address, the name the app pairs as, the **pairing token** the TV issued, and your app-button choices and the list of apps found on the TV. |
+| `~/.config/tv-remote/config.json` | Your TV's network address and MAC address, the name the app pairs as, the **pairing token** the TV issued, your app-button choices and the list of apps found on the TV, and, if you use the ESP32 bridge, its **bridge token** and the addresses allowed to use it. |
 | `~/.config/tv-remote/mirror-audio.json` | The apps and sound roles that should stay on your own speakers or headset while mirroring (e.g. Discord, Zoom). |
 | `~/.local/state/tv-mirror-audio.json` | Which sound output to switch back to when mirroring stops. |
 | A temporary folder (`/tmp/tv-cast-*`) | JPEG copies of photos converted for casting. It's deleted when you stop casting or close the app. |
@@ -40,6 +40,10 @@ Everything stays on your local network, between your computer and your TV:
   the file currently playing, and only to your TV's address, under a random link that stops
   working when the file changes. The TV is controlled over DLNA (port 9197). Your file is read
   by the TV; it's not uploaded anywhere.
+- **ESP32 bridge (only if you turn it on):** `tv-remote serve` listens on port 8198 for remote
+  keys from devices on your network that send the bridge token. The token and the commands
+  travel as plain HTTP, so anyone able to watch your local network could see them. The bridge
+  logs each request (the device's address and what it asked for) to your user journal.
 - **Screen mirroring:** handled by GNOME Network Displays, which sends your screen and sound to
   the TV over Wi-Fi Direct (Miracast). While a session is streaming, the app's audio helper
   reads the names of programs playing sound (from PipeWire and `/proc`) to decide which ones to

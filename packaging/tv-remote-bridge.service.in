@@ -1,0 +1,12 @@
+[Unit]
+Description=TV Remote HTTP bridge for ESP32 and other network remotes (tv-remote serve)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart="@APP_DIR@/venv/bin/python" -I "@APP_DIR@/tv_remote.py" serve
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
